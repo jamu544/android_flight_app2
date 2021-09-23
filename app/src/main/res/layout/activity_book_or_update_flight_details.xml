@@ -18,32 +18,37 @@
         android:id="@+id/text_view_booked_flight_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Flight Name:"
+        android:text="@string/flight_name"
         android:layout_marginTop="8dp"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_a_number_if_kid_s"
         />
 
     <NumberPicker
         android:id="@+id/number_picker_adults"
         android:layout_width="wrap_content"
+        android:orientation="vertical"
         android:layout_height="wrap_content"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_a_number_if_adult_s"
+        />
     <NumberPicker
         android:id="@+id/number_picker_children"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <EditText
-        android:id="@+id/edit_text_chidlren_base_price"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Base price for kids"
-        android:inputType="text"/>
-
-    <TextView
+     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
-        android:text="Travel from:"
+        android:text="@string/travel_from"
         android:layout_marginBottom="5dp"
         />
     <Spinner
@@ -55,7 +60,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
-        android:text="Travel to:"
+        android:text="@string/travel_to"
         android:layout_marginBottom="5dp"
         />
     <Spinner
@@ -67,20 +72,20 @@
         android:id="@+id/edit_text_depart_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Depart date"
+        android:hint="@string/depart_date_hint"
         android:inputType="textMultiLine"/>
     <EditText
         android:id="@+id/edit_text_arrive_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Arrive date:"
+        android:hint="@string/arrive_date_hint"
         android:inputType="textMultiLine"/>
 
     <Button
         android:id="@+id/button_save_booking"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BOOK"
+        android:text="@string/book_btn"
          />
 
 

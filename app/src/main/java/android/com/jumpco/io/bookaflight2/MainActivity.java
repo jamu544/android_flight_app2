@@ -7,8 +7,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import java.util.List;
@@ -19,11 +25,13 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int ADD_BOOKING_REQUEST = 1;
     public static final int EDIT_BOOKING_REQUEST = 2;
+    private PopupWindow pwindo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Choose a flight:");
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -49,17 +57,14 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(MainActivity.this, BookOrUpdateFlightDetailsActivity.class);
                 intent.putExtra(Constant.EXTRA_FLIGHT_NAME, airline.nameOfAirline);
+                intent.putExtra(Constant.EXTRA_BASE_PRICE ,airline.basePriceForPerson);
                 Toast.makeText(MainActivity.this,airline.nameOfAirline, Toast.LENGTH_SHORT).show();
 
                 startActivityForResult(intent, ADD_BOOKING_REQUEST);
 
             }
         });
-
-
     }
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -68,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
             int id = data.getIntExtra(Constant.EXTRA_ID,-1);
             String flightName = data.getStringExtra(Constant.EXTRA_FLIGHT_NAME);
-       //     String basePriceForAdults = data.getStringExtra(Constant.EXTRA_BASE_PRICE_FOR_ADULTS);
+       //   String basePriceForAdults = data.getStringExtra(Constant.EXTRA_BASE_PRICE_FOR_ADULTS);
             String basePriceForChildren = data.getStringExtra(Constant.EXTRA_BASE_PRICE_FOR_CHILDREN);
             int numberOfAdults   = data.getIntExtra(Constant.EXTRA_NO_OF_ADULTS, 1);
             int numberOfChildren = data.getIntExtra(Constant.EXTRA_NO_OF_CHILDREN,1);
@@ -116,4 +121,28 @@ public class MainActivity extends AppCompatActivity {
         // close the primary database to ensure all the transactions are merged
         AirlineDatabase.getInstance(getApplicationContext()).close();
     }
+
+
+    //show window pop-up to update flight details
+    private void showWindow(){
+        // We need to get the instance of the LayoutInflater
+        LayoutInflater inflater = (LayoutInflater) MainActivity.this
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.pop_up_window,
+                null);
+
+        //layout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        //int height = layout.getMeasuredHeight();
+        //int width = layout.getMeasuredWidth();
+
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int height = displaymetrics.heightPixels;
+        int width = displaymetrics.widthPixels;
+
+        //pwindo = new PopupWindow(layout, 1200, 600, true);
+        pwindo = new PopupWindow(layout, width-100, height-100, true);
+        pwindo.showAtLocation(layout, Gravity.CENTER, 0, 0);
+    }
+
 }

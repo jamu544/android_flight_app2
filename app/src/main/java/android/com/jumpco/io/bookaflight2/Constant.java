@@ -13,7 +13,7 @@ public class Constant {
     public static final String EXTRA_NO_OF_CHILDREN =
             "android.com.jumpco.io.bookaflight2.EXTRA_NO_OF_CHILDREN";
 
-    public static final String EXTRA_BASE_PRICE_FOR_ADULTS =
+    public static final String EXTRA_BASE_PRICE =
             "android.com.jumpco.io.bookaflight2.EXTRA_BASE_PRICE_FOR_ADULTS";
 
     public static final String EXTRA_BASE_PRICE_FOR_CHILDREN =

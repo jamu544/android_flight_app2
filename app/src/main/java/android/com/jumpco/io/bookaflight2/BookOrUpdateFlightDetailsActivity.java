@@ -4,9 +4,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,11 +18,15 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
 
@@ -30,28 +38,35 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
     private EditText editTextDepartDate;
     private EditText editTextArrivalDate;
     private Button buttonSaveBooking;
-
-    private EditText editTextBasePriceForChildren;
     private EditText editTextBasePriceForAdults;
-    private String traveloFrom;
+
+    DatePickerDialog datePickerDialog;
     private String travelTo;
 
 
+    String flightNamefromMainActivity;
+    int numberOfAdults;
+    int numberOfChildren;
+    String traveloFrom;
+    String departingDate;
+    String arrivalDate;
 
-
-
-
-
-    DatePickerDialog datePickerDialog;
-
-
-
+    private String todaysDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_or_update_flight_details);
+        setTitle("Flight Details:");
+
+
+
+        todaysDate = getDateOfTheDayOfBooking();
         init();
+        Intent intent = getIntent();
+        flightNamefromMainActivity = intent.getStringExtra(Constant.EXTRA_FLIGHT_NAME);
+         textViewFlightName.setText(flightNamefromMainActivity);
+
 
         buttonSaveBooking.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +93,6 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
         textViewFlightName = findViewById(R.id.text_view_booked_flight_name);
         numberPickerNoOfAdults = findViewById(R.id.number_picker_adults);
         numberPickerNoOfChildren = findViewById(R.id.number_picker_children);
-        editTextBasePriceForChildren = findViewById(R.id.edit_text_chidlren_base_price);
         spinnerTravelTo = findViewById(R.id.spinner_travel_to);
         spinnerTravelFrom = findViewById(R.id.spinner_travel_from);
 
@@ -141,32 +155,6 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
             }
 
         });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         numberPickerNoOfAdults.setMinValue(1);
         numberPickerNoOfAdults.setMaxValue(5);
 
@@ -178,22 +166,19 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
     //save data to booking table
     public void saveBooking() {
 
-        String flightName = textViewFlightName.getText().toString();
+
     //    String basePriceForAdults = editTextBasePriceForAdults.getText().toString();
-        String basePriceForChildren = editTextBasePriceForChildren.getText().toString();
-        int numberOfAdults = numberPickerNoOfAdults.getValue();
-        int numberOfChildren = numberPickerNoOfChildren.getValue();
-         travelTo =  (String) spinnerTravelTo.getSelectedItem();
-        traveloFrom =    (String) spinnerTravelFrom.getSelectedItem();
-
-
-        String departingDate = editTextDepartDate.getText().toString();
-        String arrivalDate = editTextArrivalDate.getText().toString();
+         numberOfAdults = numberPickerNoOfAdults.getValue();
+         numberOfChildren = numberPickerNoOfChildren.getValue();
+         travelTo = (String) spinnerTravelTo.getSelectedItem();
+         traveloFrom = (String) spinnerTravelFrom.getSelectedItem();
+         departingDate = editTextDepartDate.getText().toString();
+         arrivalDate = editTextArrivalDate.getText().toString();
 
         Intent data = new Intent();
-        data.putExtra(Constant.EXTRA_FLIGHT_NAME, flightName);
+        data.putExtra(Constant.EXTRA_FLIGHT_NAME, flightNamefromMainActivity);
   //      data.putExtra(Constant.EXTRA_BASE_PRICE_FOR_ADULTS, basePriceForAdults);
-        data.putExtra(Constant.EXTRA_BASE_PRICE_FOR_CHILDREN, basePriceForChildren);
+  //      data.putExtra(Constant.EXTRA_BASE_PRICE_FOR_CHILDREN, basePriceForChildren);
         data.putExtra(Constant.EXTRA_NO_OF_ADULTS, numberOfAdults);
         data.putExtra(Constant.EXTRA_NO_OF_CHILDREN, numberOfChildren);
         data.putExtra(Constant.EXTRA_TRAVEL_TO, travelTo);
@@ -215,13 +200,21 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("Confirm Booking");
+        builder.setMessage("Today : "+todaysDate+"\n"
+               +"Flight     "+flightNamefromMainActivity+"\n"+
+                "Depart     "+departingDate+"  "+traveloFrom+"\n"+
+                "Arrive       "+arrivalDate + "  "+travelTo+"\n"+
+                "------------------ "+"\n"+
+                "Adults     "+numberOfAdults+"\n"+
+                "Kids         "+numberOfChildren+"\n"+
+                "Total Price    "+travelTo+"\n");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
                 saveBooking();
-                Toast.makeText(BookOrUpdateFlightDetailsActivity.this, "Booking successful!", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(BookOrUpdateFlightDetailsActivity.this,
+                        "Booking successful!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -235,16 +228,43 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
 
     }
 
+    //inner interface for setting destinations
     public class DestionationOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
         public void onItemSelected(AdapterView<?> parent,
                                    View view, int pos, long id) {
-            Toast.makeText(BookOrUpdateFlightDetailsActivity.this, "The planet is " + parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(BookOrUpdateFlightDetailsActivity.this, "Selected: " +
+                    parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
         }
 
         public void onNothingSelected(AdapterView parent) {
             // Do nothing.
         }
+    }
+
+    //calculate 30% off from the base price for kids
+    private long calculateKidsBasePrice(int basePrice){
+
+//        double amount = Double.parseDouble(e.getText().toString());
+//        double res = (amount / 100.0f) * 10;
+
+        return 0;
+    }
+
+    // sum of the ticket
+    private long totalPriceOfTheBooking(){
+
+        return 0;
+    }
+
+    @Override // disable on Back button
+    public void onBackPressed() {  }
+
+    //get the date of the day a booking is made
+    private String getDateOfTheDayOfBooking() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 
 
