@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">BookAFlight2</string>
+
+
+
+
+
+
+    <string-array name="destinations">
+        <item>USA</item>
+        <item>ENGLAND</item>
+        <item>SOUTH AFRICA</item>
+        <item>AUSTRALIA</item>
+        <item>CANADA</item>
+    </string-array>
+
 </resources>

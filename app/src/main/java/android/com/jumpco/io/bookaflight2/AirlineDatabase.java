@@ -9,11 +9,13 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Airline.class}, version = 1,exportSchema = false)
+@Database(entities = {Airline.class,Booking.class}, version = 1,exportSchema = false)
 public abstract class AirlineDatabase extends RoomDatabase {
     private static AirlineDatabase instance;
 
     public abstract AirlineDao airlineDao();
+
+    public abstract BookingDao bookingDao();
 
     public static synchronized AirlineDatabase getInstance(Context context){
 

@@ -8,14 +8,229 @@ import java.util.List;
 import androidx.lifecycle.LiveData;
 
 public class AirlineRepository {
+    //prepopulated liyt of airlines
     private AirlineDao airlineDao;
     private LiveData<List<Airline>> allAirlines;
+
+
+    private BookingDao bookingDao;
+    private LiveData<List<Booking>> allBookings;
+
+
 
     public AirlineRepository(Application application){
         AirlineDatabase database = AirlineDatabase.getInstance(application);
         airlineDao = database.airlineDao();
         allAirlines = airlineDao.getAllAirlines();
+
+
+        bookingDao = database.bookingDao();
+        allBookings = bookingDao.getAllBookings();
     }
+
+    // insert a new booking
+    public void insertBooking(Booking booking){
+        new InsertBookingAsyncTask(bookingDao).execute(booking);
+
+    }
+    //update the selected booking
+    public void updateBooking(Booking booking){
+        new UpdateBookingAsyncTask(bookingDao).execute(booking);
+
+    }
+    //delete selected booking
+    public void deleteBooking(Booking booking){
+        new DeleteBookingAsyncTask(bookingDao).execute(booking);
+    }
+
+    // delete all available bookings
+    public void deleteAllBookings(){
+        new DeleteAllBookingAsyncTask(bookingDao).execute();
+    }
+
+    public LiveData<List<Booking>> getAllBookings(){
+        return allBookings;
+    }
+
+    private static class InsertBookingAsyncTask extends AsyncTask<Booking,Void,Void> {
+
+        private BookingDao bookingDao;
+        private InsertBookingAsyncTask(BookingDao bookingDao){
+            this.bookingDao = bookingDao;
+        }
+
+
+        @Override
+        protected Void doInBackground(Booking... bookings) {
+            bookingDao.insert(bookings[0]);
+            return null;
+        }
+    }
+
+    private static class UpdateBookingAsyncTask extends AsyncTask<Booking,Void,Void> {
+
+        private BookingDao bookingDao;
+        private UpdateBookingAsyncTask(BookingDao bookingDao){
+            this.bookingDao = bookingDao;
+        }
+
+
+        @Override
+        protected Void doInBackground(Booking... bookings) {
+            bookingDao.update(bookings[0]);
+            return null;
+        }
+    }
+
+    private static class DeleteBookingAsyncTask extends AsyncTask<Booking,Void,Void> {
+
+        private BookingDao bookingDao;
+        private DeleteBookingAsyncTask(BookingDao bookingDao){
+            this.bookingDao = bookingDao;
+        }
+
+        @Override
+        protected Void doInBackground(Booking... bookings) {
+            bookingDao.delete(bookings[0]);
+            return null;
+        }
+    }
+
+    private static class DeleteAllBookingAsyncTask extends AsyncTask<Void,Void,Void> {
+
+        private BookingDao bookingDao;
+        private DeleteAllBookingAsyncTask(BookingDao bookingDao){this.bookingDao = bookingDao;}
+
+        /**
+         * @param
+         * @deprecated
+         */
+        @Override
+        protected Void doInBackground(Void... voids) {
+            bookingDao.deleteAllBookings();
+            return null;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public void insert(Airline airline){
         new InsertAirlineAsyncTask(airlineDao).execute(airline);
 

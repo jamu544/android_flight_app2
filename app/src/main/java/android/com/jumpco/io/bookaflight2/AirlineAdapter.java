@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 public class AirlineAdapter extends RecyclerView.Adapter<AirlineAdapter.AirlineHolder>{
 
     private List<Airline> airlines = new ArrayList<>();
+
+    private OnClickListener listener;
 
 
     @NonNull
@@ -55,6 +58,28 @@ public class AirlineAdapter extends RecyclerView.Adapter<AirlineAdapter.AirlineH
             textViewAirline = itemView.findViewById(R.id.text_view_airline);
             textViewPrice = itemView.findViewById(R.id.text_view_price);
             textViewReference = itemView.findViewById(R.id.text_view_book_reference);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    int position = getAdapterPosition(); //ALT CTRL L to format
+                    if (listener != null && position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(airlines.get(position));
+
+                    }
+
+                }
+            });
         }
+    }
+
+    public void setOnClickListener(OnClickListener listener) {
+        this.listener = listener;
+
+    }
+
+    //I will use this method to get object of the selected airline
+    public Airline getAirlineAt(int position) {
+        return airlines.get(position);
     }
 }
