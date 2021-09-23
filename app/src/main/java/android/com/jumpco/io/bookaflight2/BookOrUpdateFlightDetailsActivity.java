@@ -3,6 +3,7 @@ package android.com.jumpco.io.bookaflight2;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,11 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
 
@@ -34,20 +38,20 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
 
 
 
-    private String[] colors1 = {"  Black","  Brown","  Red","  Orange","  Yellow","  Green","  Blue","  Violet","  Grey","  White"};
+
+
+
+
+    DatePickerDialog datePickerDialog;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_or_update_flight_details);
         init();
-
-
-
-
-
-
-
-
 
         buttonSaveBooking.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,31 +87,85 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
                 this, R.array.destinations, android.R.layout.simple_spinner_item);
         adapterTravelFrom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTravelFrom.setAdapter(adapterTravelFrom);
-        spinnerTravelFrom.setOnItemSelectedListener(new MyOnItemSelectedListener());
+        spinnerTravelFrom.setOnItemSelectedListener(new DestionationOnItemSelectedListener());
 
         // travel to spinner and adapter
         ArrayAdapter<CharSequence> adapterTravelTo = ArrayAdapter.createFromResource(
                 this, R.array.destinations, android.R.layout.simple_spinner_item);
         adapterTravelTo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTravelTo.setAdapter(adapterTravelTo);
-        spinnerTravelTo.setOnItemSelectedListener(new MyOnItemSelectedListener());
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        spinnerTravelTo.setOnItemSelectedListener(new DestionationOnItemSelectedListener());
 
         editTextDepartDate = findViewById(R.id.edit_text_depart_date);
         editTextArrivalDate = findViewById(R.id.edit_text_arrive_date);
+
+        editTextDepartDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                final Calendar cldr = Calendar.getInstance();
+                int day = cldr.get(Calendar.DAY_OF_MONTH);
+                int month = cldr.get(Calendar.MONTH);
+                int year = cldr.get(Calendar.YEAR);
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(BookOrUpdateFlightDetailsActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                editTextDepartDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                            }
+                        }, year, month, day);
+                datePickerDialog.show();
+            }
+
+        });
+
+
+        editTextArrivalDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                final Calendar cldr = Calendar.getInstance();
+                int day = cldr.get(Calendar.DAY_OF_MONTH);
+                int month = cldr.get(Calendar.MONTH);
+                int year = cldr.get(Calendar.YEAR);
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(BookOrUpdateFlightDetailsActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                editTextArrivalDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                            }
+                        }, year, month, day);
+                datePickerDialog.show();
+            }
+
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         numberPickerNoOfAdults.setMinValue(1);
         numberPickerNoOfAdults.setMaxValue(5);
@@ -177,7 +235,7 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
 
     }
 
-    public class MyOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
+    public class DestionationOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
         public void onItemSelected(AdapterView<?> parent,
                                    View view, int pos, long id) {
@@ -188,6 +246,7 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
             // Do nothing.
         }
     }
+
 
 
 }
