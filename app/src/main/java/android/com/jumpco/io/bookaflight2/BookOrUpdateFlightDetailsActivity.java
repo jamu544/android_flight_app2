@@ -4,13 +4,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,7 +14,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +39,9 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
     private String travelTo;
 
 
-    String flightNamefromMainActivity;
+    private String flightNamefromMainActivity;
+    private int ticketBasePrice;
+
     int numberOfAdults;
     int numberOfChildren;
     String traveloFrom;
@@ -52,6 +49,16 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
     String arrivalDate;
 
     private String todaysDate;
+
+
+
+    //ticket calculation values
+
+    private long kidsBasePrice;
+    private int totalCostForAdults;
+    private int totalCostsForKids;
+    private double totalCostOfTheTickets;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,14 +72,18 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
         init();
         Intent intent = getIntent();
         flightNamefromMainActivity = intent.getStringExtra(Constant.EXTRA_FLIGHT_NAME);
-         textViewFlightName.setText(flightNamefromMainActivity);
+        ticketBasePrice = intent.getIntExtra(Constant.EXTRA_BASE_PRICE,1);
+
+
+
+        textViewFlightName.setText(flightNamefromMainActivity);
 
 
         buttonSaveBooking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                confirmBookingDailog();
+                saveBooking();
             }
         });
 
@@ -101,14 +112,14 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
                 this, R.array.destinations, android.R.layout.simple_spinner_item);
         adapterTravelFrom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTravelFrom.setAdapter(adapterTravelFrom);
-        spinnerTravelFrom.setOnItemSelectedListener(new DestionationOnItemSelectedListener());
+        spinnerTravelFrom.setOnItemSelectedListener(new android.com.jumpco.io.bookaflight2.BookOrUpdateFlightDetailsActivity.DestinationOnItemSelectedListener());
 
         // travel to spinner and adapter
         ArrayAdapter<CharSequence> adapterTravelTo = ArrayAdapter.createFromResource(
                 this, R.array.destinations, android.R.layout.simple_spinner_item);
         adapterTravelTo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTravelTo.setAdapter(adapterTravelTo);
-        spinnerTravelTo.setOnItemSelectedListener(new DestionationOnItemSelectedListener());
+        spinnerTravelTo.setOnItemSelectedListener(new android.com.jumpco.io.bookaflight2.BookOrUpdateFlightDetailsActivity.DestinationOnItemSelectedListener());
 
         editTextDepartDate = findViewById(R.id.edit_text_depart_date);
         editTextArrivalDate = findViewById(R.id.edit_text_arrive_date);
@@ -167,6 +178,10 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
     public void saveBooking() {
 
 
+
+
+
+
     //    String basePriceForAdults = editTextBasePriceForAdults.getText().toString();
          numberOfAdults = numberPickerNoOfAdults.getValue();
          numberOfChildren = numberPickerNoOfChildren.getValue();
@@ -189,30 +204,37 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
 //        if(id != -1){
 //            data.putExtra(EXTRA_ID,id);
 //        }
-        setResult(RESULT_OK, data);
-        finish();
+
+        kidsBasePrice = calculateKidsBasePrice(ticketBasePrice);
+
+        totalCostForAdults = totalCostOfTheTicketForAdults(ticketBasePrice,numberOfAdults);
+
+        totalCostsForKids = (int) totalCostOfTheTicketForKids(kidsBasePrice,numberOfChildren);
+
+        totalCostOfTheTickets =  totalPriceOfTheBooking(totalCostsForKids, totalCostForAdults);
 
 
-    }
 
-    //show dailog
-    public void confirmBookingDailog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("Confirm Booking");
         builder.setMessage("Today : "+todaysDate+"\n"
-               +"Flight     "+flightNamefromMainActivity+"\n"+
+                +"Flight     "+flightNamefromMainActivity+"\n"+
                 "Depart     "+departingDate+"  "+traveloFrom+"\n"+
                 "Arrive       "+arrivalDate + "  "+travelTo+"\n"+
                 "------------------ "+"\n"+
-                "Adults     "+numberOfAdults+"\n"+
-                "Kids         "+numberOfChildren+"\n"+
-                "Total Price    "+travelTo+"\n");
+                "Adults     "+numberOfAdults+"x"+ticketBasePrice+"\n"+
+                "Kids         "+numberOfChildren+"x" +kidsBasePrice+
+                ""+"\n"+
+                "Total Price    "+totalCostOfTheTickets+"\n");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                saveBooking();
+
+                setResult(RESULT_OK, data);
+                finish();
+//                saveBooking();
                 Toast.makeText(BookOrUpdateFlightDetailsActivity.this,
                         "Booking successful!", Toast.LENGTH_SHORT).show();
             }
@@ -228,8 +250,13 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
 
     }
 
+    //show dailog
+    public void confirmBookingDailog() {
+
+    }
+
     //inner interface for setting destinations
-    public class DestionationOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
+    public class DestinationOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
         public void onItemSelected(AdapterView<?> parent,
                                    View view, int pos, long id) {
@@ -243,19 +270,36 @@ public class BookOrUpdateFlightDetailsActivity extends AppCompatActivity {
     }
 
     //calculate 30% off from the base price for kids
-    private long calculateKidsBasePrice(int basePrice){
+    private long calculateKidsBasePrice(int ticketBasePrice){
 
-//        double amount = Double.parseDouble(e.getText().toString());
-//        double res = (amount / 100.0f) * 10;
+        double amount = ticketBasePrice;
+        double results = (amount / 100.0f) * 30;
 
-        return 0;
+        return (long) results;
+    }
+
+    private double totalCostOfTheTicketForKids(double kidsBasePrice, int numberOfChildren){
+        double totalCost  =  numberOfChildren * kidsBasePrice;
+
+        return totalCost;
     }
 
     // sum of the ticket
-    private long totalPriceOfTheBooking(){
+    private long totalPriceOfTheBooking(int childrenTotalPrice,int totalCostOfTheTicketForAdults){
 
-        return 0;
+        long sum = childrenTotalPrice + totalCostOfTheTicketForAdults;
+        return sum;
     }
+
+    // calculate the base price of the ticket for the selected number of adults
+    private int totalCostOfTheTicketForAdults(int ticketBasePrice,int numberOfAdults ){
+
+        int totalCost  = numberOfAdults * ticketBasePrice;
+
+        return totalCost;
+    }
+
+
 
     @Override // disable on Back button
     public void onBackPressed() {  }

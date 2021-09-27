@@ -9,7 +9,7 @@ public class Booking {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String flightName;
-    private String basePriceForAdults;
+    private int basePriceForAdults;
     private String basePriceForChildren;
     private int numberOfAdults;
     private int numberOfChildren;
@@ -19,7 +19,7 @@ public class Booking {
     private String arrivalDate;
 
 
-    public Booking(int id, String flightName, String basePriceForAdults, String basePriceForChildren,
+    public Booking(int id, String flightName, int basePriceForAdults, String basePriceForChildren,
                    int numberOfAdults, int numberOfChildren, String travelTo,
                    String traveloFrom, String departingDate, String arrivalDate) {
         this.id = id;
@@ -50,11 +50,11 @@ public class Booking {
         this.flightName = flightName;
     }
 
-    public String getBasePriceForAdults() {
+    public int getBasePriceForAdults() {
         return basePriceForAdults;
     }
 
-    public void setBasePriceForAdults(String basePriceForAdults) {
+    public void setBasePriceForAdults(int basePriceForAdults) {
         this.basePriceForAdults = basePriceForAdults;
     }
 

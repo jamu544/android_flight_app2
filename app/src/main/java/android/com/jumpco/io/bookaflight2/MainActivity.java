@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, BookOrUpdateFlightDetailsActivity.class);
                 intent.putExtra(Constant.EXTRA_FLIGHT_NAME, airline.nameOfAirline);
                 intent.putExtra(Constant.EXTRA_BASE_PRICE ,airline.basePriceForPerson);
-                Toast.makeText(MainActivity.this,airline.nameOfAirline, Toast.LENGTH_SHORT).show();
 
                 startActivityForResult(intent, ADD_BOOKING_REQUEST);
 
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
             int id = data.getIntExtra(Constant.EXTRA_ID,-1);
             String flightName = data.getStringExtra(Constant.EXTRA_FLIGHT_NAME);
-       //   String basePriceForAdults = data.getStringExtra(Constant.EXTRA_BASE_PRICE_FOR_ADULTS);
+            int basePriceForAdults = data.getIntExtra(Constant.EXTRA_BASE_PRICE,1);
             String basePriceForChildren = data.getStringExtra(Constant.EXTRA_BASE_PRICE_FOR_CHILDREN);
             int numberOfAdults   = data.getIntExtra(Constant.EXTRA_NO_OF_ADULTS, 1);
             int numberOfChildren = data.getIntExtra(Constant.EXTRA_NO_OF_CHILDREN,1);
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             // saving to the database
-            Booking booking = new Booking(id,flightName,"22",basePriceForChildren,numberOfAdults,
+            Booking booking = new Booking(id,flightName,basePriceForAdults,basePriceForChildren,numberOfAdults,
                     numberOfChildren,travelTo,traveloFrom,departingDate,arrivalDate);
             airlineViewModel.insertBookingViewModel(booking);
 
